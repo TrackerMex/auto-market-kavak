@@ -1,46 +1,63 @@
-# Astro Starter Kit: Basics
+# Auto Market Kavak Dashboard
 
-```sh
-npm create astro@latest -- --template basics
+Dashboard frontend para visualizar instalaciones de servicios de unidades, consumiendo datos desde Google Sheets API.
+
+## Stack
+
+- Astro + React (islands)
+- Tailwind CSS v4
+- Shadcn/ui
+- TypeScript (strict)
+- ESLint + Prettier
+
+## Requisitos
+
+- Node.js 22.12+
+- npm 10+
+
+## Variables de entorno
+
+1. Copia `.env.example` a `.env.local`.
+2. Completa los valores:
+
+```env
+VITE_GOOGLE_SHEETS_ID=1dLm00EofQzziwX0_TyZrLdS0FJUmmVR44kpGhNTb7ws
+VITE_GOOGLE_API_KEY=your_google_api_key
+VITE_POLLING_INTERVAL=300000
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Scripts
 
-## 🚀 Project Structure
+- `npm run dev`: inicia servidor local en `http://localhost:4321`
+- `npm run build`: crea build de produccion en `dist/`
+- `npm run preview`: previsualiza build localmente
+- `npm run lint`: ejecuta ESLint
+- `npm run lint:fix`: corrige problemas auto-fixables de ESLint
+- `npm run format`: formatea proyecto con Prettier
+- `npm run format:check`: valida formato sin modificar archivos
 
-Inside of your Astro project, you'll see the following folders and files:
+## Estructura inicial
 
 ```text
-/
-├── public/
-│   └── favicon.svg
-├── src
-│   ├── assets
-│   │   └── astro.svg
-│   ├── components
-│   │   └── Welcome.astro
-│   ├── layouts
-│   │   └── Layout.astro
-│   └── pages
-│       └── index.astro
-└── package.json
+src/
+├─ components/
+│  ├─ charts/
+│  ├─ common/
+│  ├─ dashboard/
+│  ├─ layout/
+│  ├─ map/
+│  ├─ table/
+│  └─ ui/
+├─ hooks/
+├─ layouts/
+├─ lib/
+│  ├─ api/
+│  ├─ cache/
+│  ├─ polling/
+│  ├─ utils/
+│  └─ constants.ts
+├─ pages/
+├─ stores/
+├─ styles/
+└─ types/
 ```
-
-To learn more about the folder structure of an Astro project, refer to [our guide on project structure](https://docs.astro.build/en/basics/project-structure/).
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
