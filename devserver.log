@@ -1,0 +1,56 @@
+
+> auto-market-kavak@0.0.1 dev
+> astro dev --host 127.0.0.1 --port 4321
+
+[32m✔[0m [33mConsole Ninja[0m extension is connected to [33mVite[0m, see [36mhttps://tinyurl.com/2vt8jxzw[0m
+[vite] connected.
+[2m12:39:58[22m [34m[types][39m Generated [2m5ms[22m
+[33m[1m12:39:58[22m [WARN] [content][39m Content config not loaded
+[2m12:39:58[22m [34m[vite][39m Re-optimizing dependencies because vite config has changed
+[42m[1m astro [22m[49m [32mv6.1.7[39m [2mready in[22m 4910 [2mms[22m
+[2m┃[22m Local    [36mhttp://127.0.0.1:4321/[39m
+[2m12:39:58[22m [32mwatching for file changes...[39m
+[2m12:40:08[22m [34m[200][39m / [2m241ms[22m
+[2m12:40:17[22m [34m[vite][39m [32m✨ new dependencies optimized: [33mastro/runtime/client/dev-toolbar/entrypoint.js[32m[39m
+[2m12:40:17[22m [34m[vite][39m [32m✨ optimized dependencies changed. reloading[39m
+[2m12:40:17[22m [34m[200][39m / [2m108ms[22m
+[2m12:40:18[22m [33m[404][39m /@id/astro/runtime/client/dev-toolbar/astro_runtime_client_dev-toolbar_entrypoint__js.js.map [2m14ms[22m
+[2m12:40:27[22m [34m[200][39m / [2m146ms[22m
+[2m12:40:51[22m [34m[200][39m / [2m140ms[22m
+[2m12:40:51[22m [33m[404][39m /@id/astro/runtime/client/dev-toolbar/astro_runtime_client_dev-toolbar_entrypoint__js.js.map [2m2ms[22m
+[2m12:41:50[22m [34m[200][39m / [2m91ms[22m
+[2m12:42:22[22m [33m[404][39m /@id/astro/runtime/client/dev-toolbar/astro_runtime_client_dev-toolbar_entrypoint__js.js.map [2m1ms[22m
+[2m12:42:33[22m [34m[200][39m / [2m71ms[22m
+[2m12:42:35[22m [33m[404][39m /@id/astro/runtime/client/dev-toolbar/astro_runtime_client_dev-toolbar_entrypoint__js.js.map [2m3ms[22m
+[2m12:42:46[22m [34m[watch][39m /src/styles/global.css, /src/components/table/installations-data-table.tsx
+[2m12:42:46[22m [34m[watch][39m src/components/table/installations-data-table.tsx
+[vite] program reload
+[2m12:43:21[22m [34m[200][39m / [2m118ms[22m
+[2m12:43:22[22m [33m[404][39m /@id/astro/runtime/client/dev-toolbar/astro_runtime_client_dev-toolbar_entrypoint__js.js.map [2m2ms[22m
+[2m12:43:46[22m [34m[watch][39m /src/styles/global.css, /src/components/table/installations-data-table.tsx
+[2m12:43:46[22m [34m[watch][39m src/components/table/installations-data-table.tsx
+[vite] program reload
+[2m12:44:22[22m [34m[200][39m / [2m97ms[22m
+[2m12:44:24[22m [33m[404][39m /@id/astro/runtime/client/dev-toolbar/astro_runtime_client_dev-toolbar_entrypoint__js.js.map [2m8ms[22m
+[2m12:44:43[22m [34m[200][39m / [2m217ms[22m
+[2m12:44:44[22m [33m[404][39m /@id/astro/runtime/client/dev-toolbar/astro_runtime_client_dev-toolbar_entrypoint__js.js.map [2m4ms[22m
+[2m12:46:59[22m [34m[200][39m / [2m95ms[22m
+[2m12:59:34[22m [34m[watch][39m /src/styles/global.css
+[2m13:01:13[22m [34m[watch][39m /src/styles/global.css
+[2m13:02:36[22m [34m[watch][39m /src/styles/global.css
+[2m13:17:31[22m [34m[watch][39m /src/styles/global.css, /src/components/dashboard/installations-dashboard.tsx
+[2m13:17:31[22m [34m[watch][39m src/lib/utils/installation-parser.ts
+[vite] program reload
+[2m13:18:15[22m [34m[watch][39m /src/styles/global.css, /src/components/dashboard/installations-dashboard.tsx
+[2m13:18:15[22m [34m[watch][39m src/lib/dashboard-analytics.ts
+[vite] program reload
+[2m13:27:04[22m [34m[200][39m / [2m149ms[22m
+[2m13:27:27[22m [34m[200][39m / [2m933ms[22m
+[2m13:31:06[22m [34m[watch][39m /src/styles/global.css, /src/components/section-cards.tsx
+[2m13:31:06[22m [34m[watch][39m src/components/section-cards.tsx
+[vite] program reload
+[2m13:53:01[22m [34m[200][39m / [2m130ms[22m
+[2m13:53:02[22m [33m[404][39m /@id/astro/runtime/client/dev-toolbar/astro_runtime_client_dev-toolbar_entrypoint__js.js.map [2m3ms[22m
+[2m13:53:23[22m [34m[watch][39m /src/styles/global.css, /src/components/section-cards.tsx
+[2m13:53:23[22m [34m[watch][39m src/components/section-cards.tsx
+[vite] program reload

@@ -17,6 +17,20 @@ const { title = "Auto Market Kavak Dashboard" } = Astro.props;
     <link rel="icon" href="/favicon.ico" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <script is:inline>
+      (() => {
+        const key = "auto-market-kavak:theme";
+        try {
+          const stored = window.localStorage.getItem(key);
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const shouldUseDark = stored ? stored === "dark" : prefersDark;
+          document.documentElement.classList.toggle("dark", shouldUseDark);
+        } catch {
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.classList.toggle("dark", prefersDark);
+        }
+      })();
+    </script>
   </head>
   <body>
     <slot />

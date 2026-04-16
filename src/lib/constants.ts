@@ -22,6 +22,8 @@ export const SHEET_RANGE =
 
 export const INSTALLATIONS_CACHE_KEY = "auto-market-kavak:installations";
 export const INSTALLATIONS_TABLE_PREFERENCES_KEY = "auto-market-kavak:table-preferences";
+export const DASHBOARD_FILTERS_PREFERENCES_KEY = "auto-market-kavak:dashboard-filters";
+export const THEME_STORAGE_KEY = "auto-market-kavak:theme";
 export const CACHE_TTL_MS = POLLING_INTERVAL_MS;
 export const REQUEST_THROTTLE_MS = 10 * 1000;
 export const TABLE_VIRTUAL_ROW_HEIGHT = 56;
