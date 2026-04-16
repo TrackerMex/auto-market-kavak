@@ -7,6 +7,7 @@ export interface Coordinates {
 
 export interface Installation {
   id: string;
+  sourceRowIndex: number;
   servicio: string;
   vin: string;
   numeroEquipo: string;
@@ -23,4 +24,10 @@ export interface Installation {
   observaciones: string;
   estatusFinal: InstallationStatus;
   porcentajeAvance: number;
+}
+
+export interface InstallationsData {
+  installations: Installation[];
+  checksum: string;
+  fetchedAt: number;
 }
