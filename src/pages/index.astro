@@ -1,5 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
+import { InstallationsDashboard } from "@/components/dashboard/installations-dashboard";
 ---
 
 <Layout title="Dashboard de Instalaciones | Auto Market Kavak">
@@ -12,28 +13,10 @@ import Layout from "@/layouts/Layout.astro";
         Dashboard de instalaciones
       </h1>
       <p class="text-muted-foreground max-w-3xl text-sm md:text-base">
-        Base del proyecto lista para iniciar la construccion del dashboard con Astro, Shadcn y
-        Tailwind.
+        Integracion con Google Sheets, tabla virtualizada, filtros avanzados y preferencias persistentes.
       </p>
     </header>
 
-    <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-      <article class="border-border bg-card rounded-2xl border p-4">
-        <p class="text-muted-foreground text-sm">Estado del setup</p>
-        <p class="text-foreground mt-2 text-lg font-semibold">Completado</p>
-      </article>
-      <article class="border-border bg-card rounded-2xl border p-4">
-        <p class="text-muted-foreground text-sm">Integraciones</p>
-        <p class="text-foreground mt-2 text-lg font-semibold">React + Tailwind + Shadcn</p>
-      </article>
-      <article class="border-border bg-card rounded-2xl border p-4">
-        <p class="text-muted-foreground text-sm">Actualizacion de datos</p>
-        <p class="text-foreground mt-2 text-lg font-semibold">Cada 5 minutos</p>
-      </article>
-      <article class="border-border bg-card rounded-2xl border p-4">
-        <p class="text-muted-foreground text-sm">Modo de dashboard</p>
-        <p class="text-foreground mt-2 text-lg font-semibold">Solo lectura</p>
-      </article>
-    </section>
+    <InstallationsDashboard client:load />
   </main>
 </Layout>
