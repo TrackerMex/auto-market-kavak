@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 
+import kavakLogo from "@/assets/logo_kavak.svg?url";
+import secondaryLogo from "@/assets/logo.svg?url";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { SectionCards } from "@/components/section-cards";
 import { Button } from "@/components/ui/button";
@@ -35,7 +37,10 @@ function formatDateTime(timestamp: number) {
 
 export function InstallationsDashboard() {
   const { data, error, hasChanges, isLoading, sync } = useInstallations();
-  const installations = useMemo(() => data?.installations ?? EMPTY_INSTALLATIONS, [data?.installations]);
+  const installations = useMemo(
+    () => data?.installations ?? EMPTY_INSTALLATIONS,
+    [data?.installations],
+  );
 
   const [filters] = useState<DashboardFilters>(() => {
     if (typeof window === "undefined") {
@@ -50,16 +55,18 @@ export function InstallationsDashboard() {
     [installations, filters],
   );
 
-  const metrics = useMemo(() => computeDashboardMetrics(filteredInstallations), [filteredInstallations]);
+  const metrics = useMemo(
+    () => computeDashboardMetrics(filteredInstallations),
+    [filteredInstallations],
+  );
 
   return (
     <main className="mx-auto w-full max-w-7xl space-y-4 p-4 md:p-6">
-      <header className="bg-background/95 sticky top-0 z-20 flex flex-col gap-3 rounded-xl border border-border p-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
+      <header className="bg-background/95 border-border sticky top-0 z-20 flex flex-col gap-3 rounded-xl border p-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <h1 className="truncate text-base font-semibold md:text-lg">Dashboard de instalaciones</h1>
-          <p className="text-muted-foreground truncate text-xs md:text-sm">
-            Lectura directa de Google Sheets y actualizacion automatica cada 5 minutos.
-          </p>
+          <h1 className="truncate text-base font-semibold md:text-lg">
+            Instalaciones GPS - Kavak Auto Market
+          </h1>
         </div>
         <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center">
           <ThemeToggle />
@@ -77,7 +84,33 @@ export function InstallationsDashboard() {
         </div>
       </header>
 
-      <section id="resumen" className="space-y-3 rounded-xl border border-border bg-card p-4">
+      <section
+        id="intro"
+        className="border-border bg-card space-y-6 rounded-xl border p-4 text-center"
+      >
+        <div className="flex flex-col items-center gap-4">
+          <div className="px-3 py-3">
+            <img
+              src={kavakLogo}
+              alt="Kavak"
+              width={304}
+              height={80}
+              className="h-12 w-auto max-w-full shrink-0 dark:invert sm:h-14"
+            />
+          </div>
+          <div>
+            <img
+              src={secondaryLogo}
+              alt="Logo Auto Market"
+              width={420}
+              height={70}
+              className="h-10 w-auto max-w-full shrink-0 invert dark:invert-0 sm:h-12"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section id="resumen" className="border-border bg-card space-y-3 rounded-xl border p-4">
         <div className="text-muted-foreground flex flex-wrap items-center gap-2 text-sm">
           <span>{isLoading ? "Sincronizando datos..." : "Datos sincronizados"}</span>
           {data?.fetchedAt ? <span>Ultima lectura: {formatDateTime(data.fetchedAt)}</span> : null}
@@ -89,7 +122,9 @@ export function InstallationsDashboard() {
         </div>
 
         {error ? (
-          <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+          <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {error}
+          </p>
         ) : null}
       </section>
 
