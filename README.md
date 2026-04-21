@@ -26,6 +26,7 @@ PUBLIC_GOOGLE_API_KEY=your_google_api_key
 PUBLIC_GOOGLE_SHEET_NAME=Auto Market Kavak
 PUBLIC_GOOGLE_SHEET_RANGE=A1:P
 PUBLIC_POLLING_INTERVAL=300000
+PUBLIC_SITE_URL=https://your-domain.example
 ```
 
 Si aparece `Falta PUBLIC_GOOGLE_SHEETS_ID`, normalmente significa que no existe el archivo `.env.local`
@@ -37,6 +38,38 @@ Checklist rapido de credenciales:
 2. API key activa y sin restricciones que bloqueen `sheets.googleapis.com`.
 3. Hoja compartida con acceso de lectura (o publicada) para la estrategia elegida.
 4. Reiniciar `npm run dev` despues de cambios en `.env.local`.
+
+## SEO implementado
+
+- Metadatos base (`description`, `robots`, `canonical`) en `src/layouts/Layout.astro`
+- Open Graph y Twitter Cards para compartir enlaces
+- Datos estructurados JSON-LD (`WebApplication`)
+- Canonical dinamico usando `PUBLIC_SITE_URL` o `site` de Astro
+
+## Ruta sugerida para deploy (Vercel)
+
+1. **Preparar repo**
+   - Validar local: `npm run lint` y `npm run build`
+   - Confirmar que `.env.local` no se suba al repo
+2. **Crear proyecto en Vercel**
+   - Importar repositorio
+   - Framework detectado: Astro
+   - Build Command: `npm run build`
+   - Output Directory: `dist`
+3. **Configurar variables de entorno en Vercel**
+   - `PUBLIC_GOOGLE_SHEETS_ID`
+   - `PUBLIC_GOOGLE_API_KEY`
+   - `PUBLIC_GOOGLE_SHEET_NAME`
+   - `PUBLIC_GOOGLE_SHEET_RANGE`
+   - `PUBLIC_POLLING_INTERVAL`
+   - `PUBLIC_SITE_URL` (URL final de produccion)
+4. **Ajustar restricciones de API key en Google Cloud**
+   - Agregar el dominio de Vercel en HTTP referrers (`https://tu-dominio/*`)
+   - Mantener habilitada Google Sheets API
+5. **Verificar post-deploy**
+   - Abrir dashboard y validar que no aparezca bloqueo por referer
+   - Revisar metatags en `view-source`
+   - Ejecutar `npm run preview` local si necesitas replicar entorno de build
 
 ## Fase 2 completada
 

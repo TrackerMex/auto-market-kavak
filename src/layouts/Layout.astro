@@ -3,9 +3,41 @@ import "@/styles/global.css";
 
 interface Props {
   title?: string;
+  description?: string;
+  canonicalPath?: string;
+  ogType?: "website" | "article";
+  noindex?: boolean;
 }
 
-const { title = "Auto Market Kavak Dashboard" } = Astro.props;
+const {
+  title = "Auto Market Kavak Dashboard",
+  description = "Dashboard de instalaciones Auto Market Kavak.",
+  canonicalPath = "/",
+  ogType = "website",
+  noindex = false,
+} = Astro.props;
+
+const envSiteUrl = import.meta.env.PUBLIC_SITE_URL?.trim();
+const baseUrl = Astro.site?.toString() || envSiteUrl || "";
+const normalizedBase = baseUrl ? baseUrl.replace(/\/$/, "") : "";
+const normalizedPath = canonicalPath.startsWith("/") ? canonicalPath : `/${canonicalPath}`;
+const canonicalUrl = normalizedBase ? `${normalizedBase}${normalizedPath}` : undefined;
+const robots = noindex ? "noindex,nofollow" : "index,follow";
+
+const siteName = "Auto Market Kavak";
+const ogTitle = title;
+const ogDescription = description;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: ogTitle,
+  description: ogDescription,
+  applicationCategory: "BusinessApplication",
+  operatingSystem: "Web",
+  inLanguage: "es-MX",
+  ...(canonicalUrl ? { url: canonicalUrl } : {}),
+};
 ---
 
 <!doctype html>
@@ -13,10 +45,39 @@ const { title = "Auto Market Kavak Dashboard" } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/tracker_icon.svg" />
+    <link rel="icon" href="/tracker_icon.svg" />
+    <meta name="description" content={description} />
+    <meta name="robots" content={robots} />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#171717" media="(prefers-color-scheme: dark)" />
+    {canonicalUrl ? <link rel="canonical" href={canonicalUrl} /> : null}
+    <meta property="og:locale" content="es_MX" />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    {canonicalUrl ? <meta property="og:url" content={canonicalUrl} /> : null}
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={ogTitle} />
+    <meta name="twitter:description" content={ogDescription} />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <script is:inline>
+      (() => {
+        const key = "auto-market-kavak:theme";
+        try {
+          const stored = window.localStorage.getItem(key);
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          const shouldUseDark = stored ? stored === "dark" : prefersDark;
+          document.documentElement.classList.toggle("dark", shouldUseDark);
+        } catch {
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.classList.toggle("dark", prefersDark);
+        }
+      })();
+    </script>
   </head>
   <body>
     <slot />
