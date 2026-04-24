@@ -2,16 +2,22 @@ import { useMemo, useState } from "react";
 
 import kavakLogo from "@/assets/logo_kavak.svg?url";
 import secondaryLogo from "@/assets/logo.svg?url";
+import { DownloadIcon } from "lucide-react";
 import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { SectionCards } from "@/components/section-cards";
+import { VerticalBarCharts } from "@/components/charts/vertical-bar-charts";
 import { Button } from "@/components/ui/button";
 import { useInstallations } from "@/hooks/use-installations";
 import { readDashboardFiltersPreferences } from "@/lib/cache/dashboard-filters-preferences";
 import {
   applyDashboardFilters,
+  buildProjectProgressData,
+  buildStatusChartData,
+  buildTimelineData,
   computeDashboardMetrics,
   type DashboardFilters,
 } from "@/lib/dashboard-analytics";
+import { exportInstallationsToExcel } from "@/lib/utils/export-utils";
 import { InstallationsDataTable } from "@/components/table/installations-data-table";
 import type { Installation } from "@/types/installation";
 
@@ -33,6 +39,14 @@ function formatDateTime(timestamp: number) {
   } catch {
     return "-";
   }
+}
+
+function formatExportFilename() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `kavak_instalaciones_${year}${month}${day}`;
 }
 
 export function InstallationsDashboard() {
@@ -59,6 +73,26 @@ export function InstallationsDashboard() {
     () => computeDashboardMetrics(filteredInstallations),
     [filteredInstallations],
   );
+
+  const statusChartData = useMemo(
+    () => buildStatusChartData(filteredInstallations),
+    [filteredInstallations],
+  );
+
+  const projectProgressData = useMemo(
+    () => buildProjectProgressData(filteredInstallations),
+    [filteredInstallations],
+  );
+
+  const timelineData = useMemo(
+    () => buildTimelineData(filteredInstallations),
+    [filteredInstallations],
+  );
+
+  const handleExportExcel = () => {
+    const filename = formatExportFilename();
+    exportInstallationsToExcel(filteredInstallations, filename);
+  };
 
   return (
     <main className="mx-auto w-full max-w-7xl space-y-4 p-4 md:p-6">
@@ -130,7 +164,28 @@ export function InstallationsDashboard() {
 
       <SectionCards metrics={metrics} />
 
+      <section id="graficas">
+        <VerticalBarCharts
+          statusData={statusChartData}
+          projectData={projectProgressData}
+          timelineData={timelineData}
+        />
+      </section>
+
       <section id="tabla">
+        <div className="flex justify-end pb-2">
+          <Button
+            type="button"
+            variant="default"
+            size="sm"
+            className="h-11 gap-2"
+            onClick={handleExportExcel}
+            disabled={filteredInstallations.length === 0}
+          >
+            <DownloadIcon className="h-4 w-4" />
+            Exportar Excel
+          </Button>
+        </div>
         <InstallationsDataTable rows={filteredInstallations} isLoading={isLoading} />
       </section>
     </main>
