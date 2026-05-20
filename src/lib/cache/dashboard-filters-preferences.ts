@@ -13,7 +13,15 @@ interface DashboardFiltersStorage {
 }
 
 const DATE_RANGE_VALUES: DashboardDateRange[] = ["ALL", "7D", "30D", "90D"];
-const STATUS_VALUES: DashboardStatusFilter[] = ["ALL", "PENDIENTE", "FINALIZADO"];
+const STATUS_VALUES: DashboardStatusFilter[] = [
+  "ALL",
+  "PROGRAMADO",
+  "ATRASADO",
+  "EN_PROCESO",
+  "EN_PROCESO_DESFASADO",
+  "FINALIZADO_A_TIEMPO",
+  "FINALIZADO_DESFASADO",
+];
 
 function isDateRange(value: unknown): value is DashboardDateRange {
   return DATE_RANGE_VALUES.includes(value as DashboardDateRange);

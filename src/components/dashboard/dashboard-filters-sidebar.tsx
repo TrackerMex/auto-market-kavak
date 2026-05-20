@@ -16,8 +16,12 @@ const DATE_RANGE_OPTIONS: Array<{ value: DashboardDateRange; label: string }> = 
 
 const STATUS_OPTIONS: Array<{ value: DashboardStatusFilter; label: string }> = [
   { value: "ALL", label: "Todos" },
-  { value: "PENDIENTE", label: "Pendiente" },
-  { value: "FINALIZADO", label: "Finalizado" },
+  { value: "PROGRAMADO", label: "Programado" },
+  { value: "ATRASADO", label: "Atrasado" },
+  { value: "EN_PROCESO", label: "En Proceso" },
+  { value: "EN_PROCESO_DESFASADO", label: "En Proceso (Desfasado)" },
+  { value: "FINALIZADO_A_TIEMPO", label: "Finalizado (A Tiempo)" },
+  { value: "FINALIZADO_DESFASADO", label: "Finalizado (Desfasado)" },
 ];
 
 const FILTER_PRESETS: Array<{ label: string; value: DashboardFilters }> = [
@@ -26,12 +30,12 @@ const FILTER_PRESETS: Array<{ label: string; value: DashboardFilters }> = [
     value: { dateRange: "ALL", status: "ALL", technician: "", project: "" },
   },
   {
-    label: "Pendientes 7d",
-    value: { dateRange: "7D", status: "PENDIENTE", technician: "", project: "" },
+    label: "Atrasados 7d",
+    value: { dateRange: "7D", status: "ATRASADO", technician: "", project: "" },
   },
   {
-    label: "Finalizados 30d",
-    value: { dateRange: "30D", status: "FINALIZADO", technician: "", project: "" },
+    label: "En Proceso 30d",
+    value: { dateRange: "30D", status: "EN_PROCESO", technician: "", project: "" },
   },
 ];
 

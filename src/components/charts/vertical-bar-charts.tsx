@@ -24,13 +24,29 @@ interface VerticalBarChartsProps {
 }
 
 const statusConfig = {
-  PENDIENTE: {
-    label: "Pendiente",
+  PROGRAMADO: {
+    label: "Programado",
+    color: "#3b82f6",
+  },
+  ATRASADO: {
+    label: "Atrasado",
+    color: "#f43f5e",
+  },
+  EN_PROCESO: {
+    label: "En Proceso",
+    color: "#6366f1",
+  },
+  EN_PROCESO_DESFASADO: {
+    label: "En Proceso (Desfasado)",
     color: "#f59e0b",
   },
-  FINALIZADO: {
+  FINALIZADO_A_TIEMPO: {
     label: "Finalizado",
     color: "#10b981",
+  },
+  FINALIZADO_DESFASADO: {
+    label: "Finalizado (Desfasado)",
+    color: "#eab308",
   },
 } satisfies ChartConfig;
 
@@ -104,11 +120,7 @@ export function VerticalBarCharts({
                     {statusData.map((entry) => (
                       <Cell
                         key={entry.key}
-                        fill={
-                          entry.key === "FINALIZADO"
-                            ? "var(--color-FINALIZADO)"
-                            : "var(--color-PENDIENTE)"
-                        }
+                        fill={`var(--color-${entry.key})`}
                       />
                     ))}
                   </Bar>

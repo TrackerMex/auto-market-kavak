@@ -7,6 +7,7 @@ import { ThemeToggle } from "@/components/dashboard/theme-toggle";
 import { SectionCards } from "@/components/section-cards";
 import { VerticalBarCharts } from "@/components/charts/vertical-bar-charts";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { useInstallations } from "@/hooks/use-installations";
 import { readDashboardFiltersPreferences } from "@/lib/cache/dashboard-filters-preferences";
 import {
@@ -14,6 +15,7 @@ import {
   buildProjectProgressData,
   buildStatusChartData,
   buildTimelineData,
+  buildTimelineDataForDateRange,
   computeDashboardMetrics,
   type DashboardFilters,
 } from "@/lib/dashboard-analytics";
@@ -29,6 +31,87 @@ const DEFAULT_FILTERS: DashboardFilters = {
 };
 
 const EMPTY_INSTALLATIONS: Installation[] = [];
+
+function parseDateCell(rawValue: string): Date | null {
+  const value = rawValue.trim();
+  if (!value) {
+    return null;
+  }
+
+  const nativeDate = new Date(value);
+  if (Number.isFinite(nativeDate.getTime())) {
+    return nativeDate;
+  }
+
+  const normalized = value.replace(/\s+/g, " ");
+  const match = normalized.match(
+    /^(\d{1,2})[./-](\d{1,2})[./-](\d{2,4})(?:[ T](\d{1,2}):(\d{2})(?::(\d{2}))?)?$/,
+  );
+
+  if (!match) {
+    return null;
+  }
+
+  const day = Number(match[1]);
+  const month = Number(match[2]);
+  const rawYear = Number(match[3]);
+  const year = rawYear < 100 ? 2000 + rawYear : rawYear;
+  const hour = Number(match[4] ?? 0);
+  const minute = Number(match[5] ?? 0);
+  const second = Number(match[6] ?? 0);
+
+  const parsedDate = new Date(year, month - 1, day, hour, minute, second);
+  return Number.isFinite(parsedDate.getTime()) ? parsedDate : null;
+}
+
+function getReferenceDate(installation: Installation): Date | null {
+  return (
+    parseDateCell(installation.fechaCita) ??
+    parseDateCell(installation.fechaHoraCheckin) ??
+    parseDateCell(installation.fechaCheckout)
+  );
+}
+
+function parseInputDate(value: string, endOfDay: boolean): Date | null {
+  if (!value) {
+    return null;
+  }
+
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) {
+    return null;
+  }
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+
+  return endOfDay
+    ? new Date(year, month - 1, day, 23, 59, 59, 999)
+    : new Date(year, month - 1, day, 0, 0, 0, 0);
+}
+
+function getDateBounds(installations: Installation[]) {
+  let earliest: Date | null = null;
+  let latest: Date | null = null;
+
+  for (const installation of installations) {
+    const referenceDate = getReferenceDate(installation);
+    if (!referenceDate) {
+      continue;
+    }
+
+    if (!earliest || referenceDate.getTime() < earliest.getTime()) {
+      earliest = referenceDate;
+    }
+
+    if (!latest || referenceDate.getTime() > latest.getTime()) {
+      latest = referenceDate;
+    }
+  }
+
+  return { earliest, latest };
+}
 
 function formatDateTime(timestamp: number) {
   try {
@@ -69,29 +152,72 @@ export function InstallationsDashboard() {
     [installations, filters],
   );
 
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+
+  const dateFilteredInstallations = useMemo(() => {
+    const start = parseInputDate(startDate, false);
+    const end = parseInputDate(endDate, true);
+
+    if (!start && !end) {
+      return filteredInstallations;
+    }
+
+    return filteredInstallations.filter((installation) => {
+      const referenceDate = getReferenceDate(installation);
+      if (!referenceDate) {
+        return false;
+      }
+
+      if (start && referenceDate.getTime() < start.getTime()) {
+        return false;
+      }
+
+      if (end && referenceDate.getTime() > end.getTime()) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [endDate, filteredInstallations, startDate]);
+
   const metrics = useMemo(
-    () => computeDashboardMetrics(filteredInstallations),
-    [filteredInstallations],
+    () => computeDashboardMetrics(dateFilteredInstallations),
+    [dateFilteredInstallations],
   );
 
   const statusChartData = useMemo(
-    () => buildStatusChartData(filteredInstallations),
-    [filteredInstallations],
+    () => buildStatusChartData(dateFilteredInstallations),
+    [dateFilteredInstallations],
   );
 
   const projectProgressData = useMemo(
-    () => buildProjectProgressData(filteredInstallations),
-    [filteredInstallations],
+    () => buildProjectProgressData(dateFilteredInstallations),
+    [dateFilteredInstallations],
   );
 
-  const timelineData = useMemo(
-    () => buildTimelineData(filteredInstallations),
-    [filteredInstallations],
-  );
+  const timelineData = useMemo(() => {
+    const start = parseInputDate(startDate, false);
+    const end = parseInputDate(endDate, true);
+
+    if (!start && !end) {
+      return buildTimelineData(dateFilteredInstallations);
+    }
+
+    const { earliest, latest } = getDateBounds(dateFilteredInstallations);
+    const rangeStart = start ?? earliest;
+    const rangeEnd = end ?? latest;
+
+    if (!rangeStart || !rangeEnd || rangeStart.getTime() > rangeEnd.getTime()) {
+      return [];
+    }
+
+    return buildTimelineDataForDateRange(dateFilteredInstallations, rangeStart, rangeEnd);
+  }, [dateFilteredInstallations, endDate, startDate]);
 
   const handleExportExcel = () => {
     const filename = formatExportFilename();
-    exportInstallationsToExcel(filteredInstallations, filename);
+    exportInstallationsToExcel(dateFilteredInstallations, filename);
   };
 
   return (
@@ -129,7 +255,7 @@ export function InstallationsDashboard() {
               alt="Kavak"
               width={304}
               height={80}
-              className="h-12 w-auto max-w-full shrink-0 dark:invert sm:h-14"
+              className="h-12 w-auto max-w-full shrink-0 sm:h-14 dark:invert"
             />
           </div>
           <div>
@@ -138,7 +264,7 @@ export function InstallationsDashboard() {
               alt="Logo Auto Market"
               width={420}
               height={70}
-              className="h-10 w-auto max-w-full shrink-0 invert dark:invert-0 sm:h-12"
+              className="h-10 w-auto max-w-full shrink-0 invert sm:h-12 dark:invert-0"
             />
           </div>
         </div>
@@ -153,6 +279,44 @@ export function InstallationsDashboard() {
               Cambios detectados
             </span>
           ) : null}
+        </div>
+
+        <div className="grid gap-2 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
+          <label className="space-y-1 text-sm">
+            <span className="text-muted-foreground">Fecha inicial</span>
+            <Input
+              type="date"
+              value={startDate}
+              max={endDate || undefined}
+              onChange={(event) => {
+                setStartDate(event.target.value);
+              }}
+            />
+          </label>
+
+          <label className="space-y-1 text-sm">
+            <span className="text-muted-foreground">Fecha final</span>
+            <Input
+              type="date"
+              value={endDate}
+              min={startDate || undefined}
+              onChange={(event) => {
+                setEndDate(event.target.value);
+              }}
+            />
+          </label>
+
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => {
+              setStartDate("");
+              setEndDate("");
+            }}
+            disabled={!startDate && !endDate}
+          >
+            Limpiar fechas
+          </Button>
         </div>
 
         {error ? (
@@ -180,13 +344,13 @@ export function InstallationsDashboard() {
             size="sm"
             className="h-11 gap-2"
             onClick={handleExportExcel}
-            disabled={filteredInstallations.length === 0}
+            disabled={dateFilteredInstallations.length === 0}
           >
             <DownloadIcon className="h-4 w-4" />
             Exportar Excel
           </Button>
         </div>
-        <InstallationsDataTable rows={filteredInstallations} isLoading={isLoading} />
+        <InstallationsDataTable rows={dateFilteredInstallations} isLoading={isLoading} />
       </section>
     </main>
   );

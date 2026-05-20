@@ -1,4 +1,4 @@
-import type { InstallationStatus } from "@/types/installation";
+import type { OperationalStatus } from "@/types/installation";
 
 export const DEFAULT_POLLING_INTERVAL_MS = 5 * 60 * 1000;
 
@@ -30,12 +30,20 @@ export const TABLE_VIRTUAL_ROW_HEIGHT = 56;
 export const TABLE_VIRTUAL_VIEWPORT_HEIGHT = 540;
 export const SEARCH_DEBOUNCE_MS = 220;
 
-export const STATUS_LABELS: Record<InstallationStatus, string> = {
-  PENDIENTE: "Pendiente",
-  FINALIZADO: "Finalizado",
+export const STATUS_LABELS: Record<OperationalStatus, string> = {
+  PROGRAMADO: "Programado",
+  ATRASADO: "Atrasado",
+  EN_PROCESO: "En Proceso",
+  EN_PROCESO_DESFASADO: "En Proceso (Desfasado)",
+  FINALIZADO_A_TIEMPO: "Finalizado",
+  FINALIZADO_DESFASADO: "Finalizado (Desfasado)",
 };
 
-export const STATUS_BADGE_STYLES: Record<InstallationStatus, string> = {
-  PENDIENTE: "border-yellow-200 bg-yellow-50 text-yellow-700",
-  FINALIZADO: "border-green-200 bg-green-50 text-green-700",
+export const STATUS_BADGE_STYLES: Record<OperationalStatus, string> = {
+  PROGRAMADO: "border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900/30 dark:bg-blue-950/20 dark:text-blue-400",
+  ATRASADO: "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-900/30 dark:bg-rose-950/20 dark:text-rose-400",
+  EN_PROCESO: "border-indigo-200 bg-indigo-50 text-indigo-700 dark:border-indigo-900/30 dark:bg-indigo-950/20 dark:text-indigo-400",
+  EN_PROCESO_DESFASADO: "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/30 dark:bg-amber-950/20 dark:text-amber-400",
+  FINALIZADO_A_TIEMPO: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/30 dark:bg-emerald-950/20 dark:text-emerald-400",
+  FINALIZADO_DESFASADO: "border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-900/30 dark:bg-yellow-950/20 dark:text-yellow-400",
 };

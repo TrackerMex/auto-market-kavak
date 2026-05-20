@@ -1,4 +1,5 @@
 import type { Installation } from "@/types/installation";
+import { STATUS_LABELS } from "@/lib/constants";
 
 export const INSTALLATION_COLUMNS = [
   {
@@ -110,6 +111,7 @@ export const INSTALLATION_COLUMNS_BY_KEY = Object.fromEntries(
 
 export function createInstallationSearchIndex(installation: Installation): string {
   const statusText = installation.estatusFinal === "FINALIZADO" ? "finalizado" : "pendiente";
+  const opStatusText = STATUS_LABELS[installation.estatusOperativo]?.toLowerCase() || "";
   const checkinCoords = installation.coordenadasCheckin
     ? `${installation.coordenadasCheckin.lat},${installation.coordenadasCheckin.lng}`
     : "";
@@ -133,6 +135,7 @@ export function createInstallationSearchIndex(installation: Installation): strin
     checkoutCoords,
     installation.observaciones,
     statusText,
+    opStatusText,
     `${installation.porcentajeAvance}`,
     `${installation.sourceRowIndex}`,
   ]

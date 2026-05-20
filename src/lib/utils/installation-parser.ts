@@ -1,4 +1,5 @@
 import type { Installation, InstallationStatus } from "@/types/installation";
+import { getOperationalStatus } from "@/lib/utils/installation-status";
 
 const MIN_COLUMNS = 16;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -192,7 +193,7 @@ export function parseInstallationsFromRows(rows: CellValue[][]): Installation[] 
         safeRow.push("");
       }
 
-      return {
+      const baseObj = {
         id: createInstallationId(safeRow, index + 2),
         sourceRowIndex: index + 2,
         servicio: asString(safeRow[0]),
@@ -211,6 +212,13 @@ export function parseInstallationsFromRows(rows: CellValue[][]): Installation[] 
         observaciones: asString(safeRow[13]),
         estatusFinal: parseStatus(asString(safeRow[14])),
         porcentajeAvance: parseProgress(safeRow[15]),
+      };
+
+      const estatusOperativo = getOperationalStatus(baseObj);
+
+      return {
+        ...baseObj,
+        estatusOperativo,
       } satisfies Installation;
     });
 }
@@ -222,6 +230,7 @@ export function createInstallationsChecksum(installations: Installation[]): stri
     const line = [
       installation.id,
       installation.estatusFinal,
+      installation.estatusOperativo,
       installation.porcentajeAvance,
       installation.fechaHoraCheckin,
       installation.fechaCheckout,

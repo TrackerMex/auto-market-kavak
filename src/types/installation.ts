@@ -1,5 +1,13 @@
 export type InstallationStatus = "PENDIENTE" | "FINALIZADO";
 
+export type OperationalStatus =
+  | "PROGRAMADO"
+  | "ATRASADO"
+  | "EN_PROCESO"
+  | "EN_PROCESO_DESFASADO"
+  | "FINALIZADO_A_TIEMPO"
+  | "FINALIZADO_DESFASADO";
+
 export interface Coordinates {
   lat: number;
   lng: number;
@@ -23,6 +31,7 @@ export interface Installation {
   coordenadasCheckout: Coordinates | null;
   observaciones: string;
   estatusFinal: InstallationStatus;
+  estatusOperativo: OperationalStatus;
   porcentajeAvance: number;
 }
 

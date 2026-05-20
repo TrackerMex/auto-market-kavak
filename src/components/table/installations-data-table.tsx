@@ -20,9 +20,9 @@ import {
 } from "@/lib/cache/installations-table-preferences";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import type { Installation, InstallationStatus } from "@/types/installation";
+import type { Installation, OperationalStatus } from "@/types/installation";
 
-type StatusFilter = "ALL" | InstallationStatus;
+type StatusFilter = "ALL" | OperationalStatus;
 
 const VIRTUAL_OVERSCAN_ROWS = 6;
 const SKELETON_ROW_COUNT = 8;
@@ -103,11 +103,11 @@ function renderCellValue(item: Installation, key: InstallationColumnKey) {
       return (
         <span
           className={cn(
-            "inline-flex rounded-md border px-2 py-1 text-xs font-medium",
-            STATUS_BADGE_STYLES[item.estatusFinal],
+            "inline-flex rounded-md border px-2 py-1 text-xs font-medium shrink-0 whitespace-nowrap",
+            STATUS_BADGE_STYLES[item.estatusOperativo],
           )}
         >
-          {STATUS_LABELS[item.estatusFinal]}
+          {STATUS_LABELS[item.estatusOperativo]}
         </span>
       );
     }
@@ -175,7 +175,7 @@ export function InstallationsDataTable({ rows, isLoading = false }: Installation
   const [hiddenColumns, setHiddenColumns] = useState<InstallationColumnKey[]>(
     initialPreferences.hiddenColumns,
   );
-  const [pageSize, setPageSize] = useState<number>(100);
+  const [pageSize, setPageSize] = useState<number>(10);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [scrollTop, setScrollTop] = useState(0);
 
@@ -203,7 +203,7 @@ export function InstallationsDataTable({ rows, isLoading = false }: Installation
           return true;
         }
 
-        return entry.row.estatusFinal === statusFilter;
+        return entry.row.estatusOperativo === statusFilter;
       })
       .filter((entry) => {
         if (!searchTerm) {
@@ -216,14 +216,26 @@ export function InstallationsDataTable({ rows, isLoading = false }: Installation
   }, [rowsWithSearchIndex, searchTerm, statusFilter]);
 
   const statusCounts = useMemo(() => {
-    const pending = rows.filter((item) => item.estatusFinal === "PENDIENTE").length;
-    const finished = rows.filter((item) => item.estatusFinal === "FINALIZADO").length;
-
-    return {
+    const counts = {
       all: rows.length,
-      pending,
-      finished,
+      programado: 0,
+      atrasado: 0,
+      en_proceso: 0,
+      en_proceso_desfasado: 0,
+      finalizado_a_tiempo: 0,
+      finalizado_desfasado: 0,
     };
+
+    for (const item of rows) {
+      if (item.estatusOperativo === "PROGRAMADO") counts.programado += 1;
+      else if (item.estatusOperativo === "ATRASADO") counts.atrasado += 1;
+      else if (item.estatusOperativo === "EN_PROCESO") counts.en_proceso += 1;
+      else if (item.estatusOperativo === "EN_PROCESO_DESFASADO") counts.en_proceso_desfasado += 1;
+      else if (item.estatusOperativo === "FINALIZADO_A_TIEMPO") counts.finalizado_a_tiempo += 1;
+      else if (item.estatusOperativo === "FINALIZADO_DESFASADO") counts.finalizado_desfasado += 1;
+    }
+
+    return counts;
   }, [rows]);
 
   const visibleColumns = useMemo(() => {
@@ -333,27 +345,79 @@ export function InstallationsDataTable({ rows, isLoading = false }: Installation
             type="button"
             className={cn(
               "min-h-11 shrink-0 rounded-md border px-3 py-2 text-sm font-medium sm:min-h-8 sm:py-1.5 sm:text-xs",
-              getStatusFilterClass(statusFilter === "PENDIENTE"),
+              getStatusFilterClass(statusFilter === "PROGRAMADO"),
             )}
             onClick={() => {
               resetViewportAndPage();
-              setStatusFilter("PENDIENTE");
+              setStatusFilter("PROGRAMADO");
             }}
           >
-            Pendiente ({statusCounts.pending})
+            Programado ({statusCounts.programado})
           </button>
           <button
             type="button"
             className={cn(
               "min-h-11 shrink-0 rounded-md border px-3 py-2 text-sm font-medium sm:min-h-8 sm:py-1.5 sm:text-xs",
-              getStatusFilterClass(statusFilter === "FINALIZADO"),
+              getStatusFilterClass(statusFilter === "ATRASADO"),
             )}
             onClick={() => {
               resetViewportAndPage();
-              setStatusFilter("FINALIZADO");
+              setStatusFilter("ATRASADO");
             }}
           >
-            Finalizado ({statusCounts.finished})
+            Atrasado ({statusCounts.atrasado})
+          </button>
+          <button
+            type="button"
+            className={cn(
+              "min-h-11 shrink-0 rounded-md border px-3 py-2 text-sm font-medium sm:min-h-8 sm:py-1.5 sm:text-xs",
+              getStatusFilterClass(statusFilter === "EN_PROCESO"),
+            )}
+            onClick={() => {
+              resetViewportAndPage();
+              setStatusFilter("EN_PROCESO");
+            }}
+          >
+            En Proceso ({statusCounts.en_proceso})
+          </button>
+          <button
+            type="button"
+            className={cn(
+              "min-h-11 shrink-0 rounded-md border px-3 py-2 text-sm font-medium sm:min-h-8 sm:py-1.5 sm:text-xs",
+              getStatusFilterClass(statusFilter === "EN_PROCESO_DESFASADO"),
+            )}
+            onClick={() => {
+              resetViewportAndPage();
+              setStatusFilter("EN_PROCESO_DESFASADO");
+            }}
+          >
+            En Proceso (Desfasado) ({statusCounts.en_proceso_desfasado})
+          </button>
+          <button
+            type="button"
+            className={cn(
+              "min-h-11 shrink-0 rounded-md border px-3 py-2 text-sm font-medium sm:min-h-8 sm:py-1.5 sm:text-xs",
+              getStatusFilterClass(statusFilter === "FINALIZADO_A_TIEMPO"),
+            )}
+            onClick={() => {
+              resetViewportAndPage();
+              setStatusFilter("FINALIZADO_A_TIEMPO");
+            }}
+          >
+            Finalizado ({statusCounts.finalizado_a_tiempo})
+          </button>
+          <button
+            type="button"
+            className={cn(
+              "min-h-11 shrink-0 rounded-md border px-3 py-2 text-sm font-medium sm:min-h-8 sm:py-1.5 sm:text-xs",
+              getStatusFilterClass(statusFilter === "FINALIZADO_DESFASADO"),
+            )}
+            onClick={() => {
+              resetViewportAndPage();
+              setStatusFilter("FINALIZADO_DESFASADO");
+            }}
+          >
+            Finalizado (Desfasado) ({statusCounts.finalizado_desfasado})
           </button>
         </div>
 

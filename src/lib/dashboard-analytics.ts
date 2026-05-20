@@ -1,7 +1,8 @@
-import type { Installation, InstallationStatus } from "@/types/installation";
+import type { Installation, InstallationStatus, OperationalStatus } from "@/types/installation";
+import { STATUS_LABELS } from "@/lib/constants";
 
 export type DashboardDateRange = "ALL" | "7D" | "30D" | "90D";
-export type DashboardStatusFilter = "ALL" | InstallationStatus;
+export type DashboardStatusFilter = "ALL" | OperationalStatus;
 
 export interface DashboardFilters {
   dateRange: DashboardDateRange;
@@ -20,7 +21,7 @@ export interface DashboardMetrics {
 }
 
 export interface StatusChartDatum {
-  key: InstallationStatus;
+  key: OperationalStatus;
   label: string;
   count: number;
 }
@@ -239,7 +240,9 @@ function formatDayKey(date: Date): string {
 }
 
 function isValidCoordinate(lat: number, lng: number): boolean {
-  return Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+  return (
+    Number.isFinite(lat) && Number.isFinite(lng) && Math.abs(lat) <= 90 && Math.abs(lng) <= 180
+  );
 }
 
 export function applyDashboardFilters(
@@ -250,7 +253,7 @@ export function applyDashboardFilters(
   const cutoff = getDateRangeCutoff(filters.dateRange, now);
 
   return installations.filter((installation) => {
-    if (filters.status !== "ALL" && installation.estatusFinal !== filters.status) {
+    if (filters.status !== "ALL" && installation.estatusOperativo !== filters.status) {
       return false;
     }
 
@@ -285,7 +288,10 @@ export function computeDashboardMetrics(installations: Installation[]): Dashboar
   const avgProgress =
     total > 0
       ? Math.round(
-          installations.reduce((accumulator, current) => accumulator + current.porcentajeAvance, 0) / total,
+          installations.reduce(
+            (accumulator, current) => accumulator + current.porcentajeAvance,
+            0,
+          ) / total,
         )
       : 0;
 
@@ -315,13 +321,33 @@ export function computeDashboardMetrics(installations: Installation[]): Dashboar
 }
 
 export function buildStatusChartData(installations: Installation[]): StatusChartDatum[] {
-  const pending = installations.filter((item) => item.estatusFinal === "PENDIENTE").length;
-  const finished = installations.filter((item) => item.estatusFinal === "FINALIZADO").length;
+  const counts: Record<OperationalStatus, number> = {
+    PROGRAMADO: 0,
+    ATRASADO: 0,
+    EN_PROCESO: 0,
+    EN_PROCESO_DESFASADO: 0,
+    FINALIZADO_A_TIEMPO: 0,
+    FINALIZADO_DESFASADO: 0,
+  };
 
-  return [
-    { key: "PENDIENTE", label: "Pendiente", count: pending },
-    { key: "FINALIZADO", label: "Finalizado", count: finished },
+  for (const item of installations) {
+    counts[item.estatusOperativo] = (counts[item.estatusOperativo] || 0) + 1;
+  }
+
+  const keys: OperationalStatus[] = [
+    "PROGRAMADO",
+    "ATRASADO",
+    "EN_PROCESO",
+    "EN_PROCESO_DESFASADO",
+    "FINALIZADO_A_TIEMPO",
+    "FINALIZADO_DESFASADO",
   ];
+
+  return keys.map((key) => ({
+    key,
+    label: STATUS_LABELS[key],
+    count: counts[key],
+  }));
 }
 
 export function buildProjectProgressData(
@@ -361,7 +387,25 @@ export function buildTimelineData(
   days = 14,
   now: Date = new Date(),
 ): TimelineDatum[] {
+  const endDate = new Date(now);
+  endDate.setHours(0, 0, 0, 0);
+  const startDate = new Date(endDate);
+  startDate.setDate(startDate.getDate() - (days - 1));
+
+  return buildTimelineDataForDateRange(installations, startDate, endDate);
+}
+
+export function buildTimelineDataForDateRange(
+  installations: Installation[],
+  startDate: Date,
+  endDate: Date,
+): TimelineDatum[] {
   const dailyMap = new Map<string, { total: number; finished: number; pending: number }>();
+  const normalizedStartDate = new Date(startDate);
+  const normalizedEndDate = new Date(endDate);
+
+  normalizedStartDate.setHours(0, 0, 0, 0);
+  normalizedEndDate.setHours(0, 0, 0, 0);
 
   for (const installation of installations) {
     const date = getTimelineDate(installation);
@@ -383,12 +427,13 @@ export function buildTimelineData(
   }
 
   const output: TimelineDatum[] = [];
-  const startDate = new Date(now);
-  startDate.setHours(0, 0, 0, 0);
-  startDate.setDate(startDate.getDate() - (days - 1));
+  const totalDays = Math.max(
+    1,
+    Math.floor((normalizedEndDate.getTime() - normalizedStartDate.getTime()) / DAY_MS) + 1,
+  );
 
-  for (let offset = 0; offset < days; offset += 1) {
-    const currentDay = new Date(startDate.getTime() + offset * DAY_MS);
+  for (let offset = 0; offset < totalDays; offset += 1) {
+    const currentDay = new Date(normalizedStartDate.getTime() + offset * DAY_MS);
     const dayKey = formatDayKey(currentDay);
     const dayData = dailyMap.get(dayKey) ?? { total: 0, finished: 0, pending: 0 };
 
@@ -446,12 +491,12 @@ export function buildMapPoints(installations: Installation[]): InstallationMapPo
 }
 
 export function extractFilterOptions(installations: Installation[]) {
-  const technicians = [...new Set(installations.map((item) => item.tecnicoAsignado).filter(Boolean))].sort(
-    (a, b) => a.localeCompare(b, "es", { sensitivity: "base" }),
-  );
+  const technicians = [
+    ...new Set(installations.map((item) => item.tecnicoAsignado).filter(Boolean)),
+  ].sort((a, b) => a.localeCompare(b, "es", { sensitivity: "base" }));
 
-  const projects = [...new Set(installations.map((item) => item.proyecto).filter(Boolean))].sort((a, b) =>
-    a.localeCompare(b, "es", { sensitivity: "base" }),
+  const projects = [...new Set(installations.map((item) => item.proyecto).filter(Boolean))].sort(
+    (a, b) => a.localeCompare(b, "es", { sensitivity: "base" }),
   );
 
   return {

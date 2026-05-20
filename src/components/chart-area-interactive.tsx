@@ -40,13 +40,29 @@ interface ChartAreaInteractiveProps {
 }
 
 const statusConfig = {
-  PENDIENTE: {
-    label: "Pendiente",
-    color: "var(--color-chart-3)",
+  PROGRAMADO: {
+    label: "Programado",
+    color: "#3b82f6",
   },
-  FINALIZADO: {
+  ATRASADO: {
+    label: "Atrasado",
+    color: "#f43f5e",
+  },
+  EN_PROCESO: {
+    label: "En Proceso",
+    color: "#6366f1",
+  },
+  EN_PROCESO_DESFASADO: {
+    label: "En Proceso (Desfasado)",
+    color: "#f59e0b",
+  },
+  FINALIZADO_A_TIEMPO: {
     label: "Finalizado",
-    color: "var(--color-chart-1)",
+    color: "#10b981",
+  },
+  FINALIZADO_DESFASADO: {
+    label: "Finalizado (Desfasado)",
+    color: "#eab308",
   },
 } satisfies ChartConfig;
 
@@ -115,11 +131,7 @@ export function ChartAreaInteractive({
                     {statusData.map((slice) => (
                       <Cell
                         key={slice.key}
-                        fill={
-                          slice.key === "FINALIZADO"
-                            ? "var(--color-FINALIZADO)"
-                            : "var(--color-PENDIENTE)"
-                        }
+                        fill={`var(--color-${slice.key})`}
                       />
                     ))}
                   </Pie>
